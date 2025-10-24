@@ -4,70 +4,112 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
-        // Declaramos las variables necesarias
-        int rondasJuego = 0;
-        int puntuacion = 0;
-        int vidasJugador = 3;
-        String[] insultosPiratas = { "¿Has dejado ya de usar pañales?","¿Te gustaría que te enseñara a hablar?",
-        "¿Conoces alguna isla desierta donde esconderte?", "Eres tan inutil, grumet!", "¿Por qué no te subes a un barril y te lanzas al mar?",
-        "¿Acaso crees que puedes con un verdadero pirata?", "¿Te gustaría ser mi aprendiz de pirata?", "¿Por qué no te vas a buscar un tesoro en vez de molestarme?", "¿Acaso piensas que eres más listo que yo?",
-        "¿Por qué no te largas de mi barco, inútil?" 
+
+        String[] insultosPiratas = { "¿Has dejado ya de usar pañales?",
+                "¿Conoces alguna isla desierta donde esconderte?", "Eres tan inutil, grumete!",
+                "¿Por qué no te subes a un barril y te lanzas al mar?",
+                "¿Acaso crees que puedes con un verdadero pirata?", "¿Te gustaría ser mi aprendiz de pirata?",
+                "¿Por qué no te vas a buscar un tesoro en vez de molestarme?",
+                "¿Acaso piensas que eres más listo que yo?",
+                "¿Por qué no te largas de mi barco, inútil?"
         };
 
-        String[] respuestasInsultos = { "¿Por qué? ¿Acaso querías pedir uno prestado?", "Sí que las hay, sólo que nunca las has aprendido.","No, pero seguro que tú conoces alguna.",
-        "Espero que ya hayas aprendido a tocarte la nariz.", "Buena idea, así me libraría de ti.",
-        "Claro que no, pero al menos lo intento.", "No gracias, ya tengo suficiente con un aprendiz inútil como tú.", "Porque no eres más que un lastre para mi tripulación.",
-        "No, pero tú pareces creerlo.", "Porque eres un estorbo en mi barco."
+        String[] respuestasInsultos = { "¿Por qué? ¿Acaso querías pedir uno prestado?",
+                "No, pero seguro que tú conoces alguna.",
+                "Espero que ya hayas aprendido a tocarte la nariz.", "Buena idea, así me libraría de ti.",
+                "Claro que no, pero al menos lo intento.",
+                "No gracias, ya tengo suficiente con un aprendiz inútil como tú.",
+                "Porque no eres más que un lastre para mi tripulación.",
+                "No, pero tú pareces creerlo.", "Porque eres un estorbo en mi barco."
         };
-        boolean respuestaCorrecta; // Variable para comprobar si la respuesta del usuario es correcta o no
+        String[] respuestasInsultosIncorrectas = { "No, pero seguro que tú conoces alguna.",
+                "Espero que ya hayas aprendido a tocarte la nariz.", "Buena idea, así me libraría de ti.",
+                "Claro que no, pero al menos lo intento.",
+                "No gracias, ya tengo suficiente con un aprendiz inútil como tú.",
+                "Porque no eres más que un lastre para mi tripulación.",
+                "No, pero tú pareces creerlo.", "Porque eres un estorbo en mi barco.",
+                "¿Por qué? ¿Acaso querías pedir uno prestado?"
+        };
 
-        // 'n' para salir del juego | MUY IMPORTANTE
-        char salirJuego = 'n';
+        int[] ordenRespuestas = { 0, 1, 2, 3 }; // array de indices, para mezclar el orden de las respuestas
 
-        // Creamos el objeto Scanner para leer la entrada del usuario por la terminal
+        int puntuacion = 3; // puntuacion = vidas
+
+        // respuestasInsultos y respuestasPiratas tienen el mismo indice correcto. Los
+        // insultosPiratas son random cada ronda,
+        // Y el orden de las respuestas (1 correcta y 2 incorrectas) es tambien random.
+        Random random = new Random(); // Para saber que insulto tocará
         Scanner sc = new Scanner(System.in);
-        
-        // Creamos el objeto Random para generar numeros aleatorios
-        Random random = new Random();
 
-        // Contador de Insultos y Respuestas, para eliminar las que ya se han usado
-        int insultosRestantes = insultosPiratas.length; // .length da el tamaño o el numero de elementos en un array, no de un ArrayList.
-        int respuestasRestantes = respuestasInsultos.length;
+        // Asignamos la respuesta correcta al insulto correspondiente
+        // Siempre pondremos la respuesta correcta en la respuesta 1, y las incorrectas
+        // en la 2 y 3; y luego las mezclaremos.
 
-        // Mostramos un mensaje de bienvenida al usuario
-        System.out.println("Bienvenido al juego de insultos piratas!\n\n El juego consiste en que cada jugador debe elegir una opcion entre 3, solo una correcta. \n\n Si aciertas, ganas un punto, si fallas te quita una vida. Tienes 3 vidas. \n El juego termina cuando un jugador pierde todas sus vidas o se acaban las rondas. Para salir del juego, pulsa la letra 'n'. \n\n\n Buena suerte!");
+        System.out.println("----------------------- ╬ MONKEY ISLAND ╬ --------------------");
+        System.out.println();
+        System.out.println();
+        System.out.println(
+                " Ø ¡Bienvenido Aventurero! Ø\n\n  ¤ El juego consiste en sobrevivir a los insultos de los piratas. \n Responde correctamente para ganar puntos y avanzar de ronda. \n Pero cuidado, si fallas perderás puntos. ¤ \n\n £ Si te quedas sin puntos, solo te esperará la muerte, piratilla! £ \n\n ▓ ¡Buena suerte! ▓ ");
+        System.out.println(" ® ¿Cuantas rondas quieres jugar? ® ");
 
-        // Pedimos al usuario que introduzca el numero de rondas que quiere jugar
-        System.out.println("Introduce el numero de rondas que quieres jugar: ");
+        boolean[] insultosUsados = new boolean[insultosPiratas.length]; // Array para rastrear insultos usados
+        int rondasJuegoJugadas = 0;
+        int rondasJuegoUsuario = sc.nextInt(); // Numero de rondas que quiere jugar el usuario
 
-        // Leemos el numero de rondas introducido por el usuario
-        rondasJuego = sc.nextInt();
-        System.out.println("El numero de rondas es: " + rondasJuego);
+        while (rondasJuegoJugadas < rondasJuegoUsuario && rondasJuegoJugadas < insultosPiratas.length) { // Mientras no
+                                                                                                         // se hayan
+                                                                                                         // jugado todas
+                                                                                                         // las rondas
+            rondasJuegoJugadas++; // Aumentamos las rondas jugadas
+            System.out.println(
+                    " ® Has avanzado a la ronda ® " + rondasJuegoJugadas + "\n\n ¤ Puntuación: ¤ " + puntuacion);
 
+            for (int indiceSecundario = 0; indiceSecundario < insultosPiratas.length; indiceSecundario++) {
+                // Elegir insulto aleatorio que no se haya usado
+                int indiceInsulto = random.nextInt(insultosPiratas.length);
+                while (insultosUsados[indiceInsulto]) {
+                    indiceInsulto = random.nextInt(insultosPiratas.length);
+                }
+                insultosUsados[indiceInsulto] = true; // Marcamos el insulto como usado
 
-        // Mientras el jugador tenga vidas, el juego funcionara. 
-        // Bucle principal (rondas + insultos) del juego
-        while (vidasJugador > 0 && rondasJuego > 0) {
-            // Cada ronda es un insulto nuevo
-            // por lo que las respuestas del usuario son 3, y son respuestas a los insultos
-            while (insultosRestantes > 0 && respuestasRestantes > 0) {
-                int insultos = random.nextInt(insultosRestantes); // Indice de Insultos, selecciona un insulto para mostrarlo luego, y que se elimine del array para que no vuelva a aparecer.
-                System.out.println("El pirata te dice: " + insultosPiratas[insultos]); // te printea el insulto del pirata
-                int respuestas = random.nextInt(respuestasRestantes); // ocurre igual que el indices de insultos
+                // Preguntas (insultosPiratas)
 
-                String ultimoInsulto = insultosPiratas[insultosRestantes - 1]; // restamos el insulto mostado
-                insultosPiratas[insultos] = ultimoInsulto;
+                int indicePrincipal = random.nextInt(insultosPiratas.length); // Elegimos un insulto aleatorio
+                System.out.println("\n Ø El pirata te dice: Ø " + insultosPiratas[indicePrincipal]);
 
-                insultosRestantes--; // Decrementamos el contador de insultos restantes
+                // Le restamos el insulto que ha salido de los piratas, para no repetirla.
+                insultosPiratas[insultosPiratas.length - 1] = insultosPiratas[indicePrincipal];
 
-                System.out.println("Elige la respuesta correcta: " + "a) " + respuestasInsultos[respuestas] + " b) " + respuestasInsultos[(respuestas + 1) % respuestasRestantes] + " c) " + respuestasInsultos[(respuestas + 2) % respuestasRestantes]); // Mostramos 3 opciones de respuestas, una correcta y dos incorrectas
-                char respuestaUsuario = sc.next().charAt(0); // leemos el primer caracter, ubicado en el index 0 (charAt(0))
+                // Preguntamos la respuesta al usuario
+                System.out.println(
+                        " ¤ Recuerda: Solo una respuesta es correcta. ¤ \n\n ╬ Elige tu respuesta entre estas tres: ╬ ");
 
-                // Comprobamos si la respuesta del usuario es correcta
-                String respuesta = sc.nextLine();
-                
+                // Mezclamos el orden de las respuestas, mediante nuestro array ordenRespuestas
+                for (int orden = 0; orden < ordenRespuestas.length; orden++) {
+                    int indiceOrdenRespuestas = random.nextInt(ordenRespuestas.length); // random del tamaño del array
+
+                    // guardamos el valor temporalmente, para barajarlo
+                    int temp = ordenRespuestas[orden];
+                    ordenRespuestas[orden] = ordenRespuestas[indiceOrdenRespuestas];
+                    ordenRespuestas[indiceOrdenRespuestas] = temp;
+                }
+
+                // Mostramos las respuestas, y guardamos la respuesta del usuario (1 correcta y
+                // 2 incorrectas).
+                System.out.println("\n1. " + respuestasInsultos[indicePrincipal] + "\n2. "
+                        + respuestasInsultosIncorrectas[indiceSecundario] + "\n3. "
+                        + respuestasInsultosIncorrectas[(indiceSecundario + 1) % respuestasInsultosIncorrectas.length]
+                        + "\n4. "
+                        + respuestasInsultosIncorrectas[(indiceSecundario + 2) % respuestasInsultosIncorrectas.length]);
+
+                // Guardamos la respuesta del usuario
+                int respuestaUsuario = sc.nextInt();
+
+                // Comprobamos si la respuesta es correcta (if) o boolean
+
             }
-                
         }
+    }
 }
